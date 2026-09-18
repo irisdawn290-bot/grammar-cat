@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Grammar Cat：可爱、专注的英语语法与翻译练习学习工具。"
+    />
+    <title>Grammar Cat｜英语语法学习</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/styles/main.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <nav class="topbar" aria-label="主导航">
+        <a class="brand" href="#home" aria-label="Grammar Cat 首页">
+          <span class="brand-mark" aria-hidden="true">🐱</span>
+          <span>Grammar <strong>Cat</strong></span>
+        </a>
+        <div class="topbar-actions">
+          <span class="day-badge">连续学习 <strong>1</strong> 天</span>
+          <button class="avatar" type="button" aria-label="打开个人中心">小</button>
+        </div>
+      </nav>
+
+      <div id="home-view">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">TODAY'S LITTLE STEP</p>
+          <h1 id="hero-title">和语法猫一起，<br /><em>把英语学明白。</em></h1>
+          <p class="hero-text">每天一点点语法讲解和翻译练习，让你写出更自然、更准确的英文。</p>
+          <a class="primary-button" href="#learning-path">开始今天的学习 <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="cat-scene" aria-label="一只抱着书的橘猫插画">
+          <span class="sparkle sparkle-one">✦</span><span class="sparkle sparkle-two">✦</span>
+          <div class="cloud cloud-one"></div><div class="cloud cloud-two"></div>
+          <div class="book"><span>ABC</span></div>
+          <div class="cat" aria-hidden="true">
+            <span class="ear ear-left"></span><span class="ear ear-right"></span>
+            <span class="cat-face"><i class="eye left-eye"></i><i class="eye right-eye"></i><i class="nose"></i><i class="mouth"></i><b class="cheek left-cheek"></b><b class="cheek right-cheek"></b></span>
+            <span class="cat-paw paw-left"></span><span class="cat-paw paw-right"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="progress-card" aria-label="今日学习进度">
+        <div><p>今日小目标</p><strong>完成 30 道练习</strong></div>
+        <div class="progress-track" aria-label="进度 0/30"><span></span></div>
+        <div class="progress-number"><strong>0</strong><span>/ 30 题</span></div>
+      </section>
+
+      <section class="learning-path" id="learning-path" aria-labelledby="path-title">
+        <div class="section-heading"><div><p class="eyebrow">LEARNING PATH</p><h2 id="path-title">选择今天的学习方式</h2></div><p>从理解规则到灵活运用，一步一步来。</p></div>
+        <div class="entry-grid">
+          <a class="entry-card grammar-card" href="#grammar" data-view="grammar">
+            <span class="card-icon">📚</span><span class="card-kicker">STEP 01</span><h3>语法精讲</h3>
+            <p>用清晰的讲解、例句和口诀，掌握每一个语法知识点。</p>
+            <span class="card-link">去学语法 <b>→</b></span>
+            <span class="card-decoration">Aa</span>
+          </a>
+          <a class="entry-card translation-card" href="#translation" data-view="translation">
+            <span class="card-icon">✏️</span><span class="card-kicker">STEP 02</span><h3>翻译测试</h3>
+            <p>看中文写英文，在真实表达中检验你学会了什么。</p>
+            <span class="card-link">开始测试 <b>→</b></span>
+            <span class="card-decoration">文</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="coming-soon" aria-labelledby="ai-title">
+        <span class="ai-cat" aria-hidden="true">🐾</span>
+        <div><p class="eyebrow">COMING SOON</p><h2 id="ai-title">有问题？以后可以问问 AI 语法猫。</h2><p>我们已为 AI 答疑功能预留了接入位置，未来可在学习时随时获得解释和提示。</p></div>
+        <button type="button" class="secondary-button" id="ai-preview">看看规划</button>
+      </section>
+      </div>
+
+      <section class="module-view" id="grammar-view" hidden aria-labelledby="grammar-title">
+        <button class="back-link" type="button" data-view="home">← 返回首页</button>
+        <p class="eyebrow">GRAMMAR LESSONS</p>
+        <h1 id="grammar-title">语法精讲</h1>
+        <p class="module-intro">从词类基础到复杂句表达，选择一个知识点开始学习。每节课都有结构、例句、易错点和即时小练习。</p>
+        <div class="grammar-layout">
+          <aside class="grammar-catalog" aria-label="语法知识分类">
+            <p>知识地图</p>
+            <div id="grammar-category-list"></div>
+          </aside>
+          <article class="grammar-lesson" id="grammar-lesson" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section class="module-view translation-view" id="translation-view" hidden aria-labelledby="translation-title">
+        <div class="module-topline"><button class="back-link" type="button" data-view="home">← 返回首页</button><button class="restart-button" id="restart-test" type="button">重新开始测试</button></div>
+        <p class="eyebrow">TRANSLATION PRACTICE</p>
+        <h1 id="translation-title">翻译测试 <span aria-hidden="true">✏️</span></h1>
+        <p class="module-intro">根据中文完整翻译成英文。下方仅提示单词数量，不提供英文关键词或首字母。</p>
+        <div class="test-progress" aria-label="翻译测试进度"><div><span id="question-count">第 1 题，共 3 题</span><strong id="completed-count">已完成 0 题</strong></div><div class="progress-track"><span id="test-progress-bar"></span></div></div>
+        <article class="question-card" aria-live="polite">
+          <p class="question-label">请翻译这句话</p>
+          <blockquote id="chinese-question">“你去哪了？”</blockquote>
+          <div class="word-count"><span aria-hidden="true">🐱</span><strong id="word-count">4 个单词</strong><span>请完整填写英文句子</span></div>
+          <div class="sentence-blanks" id="sentence-blanks" aria-label="英文答案有 4 个单词"><span>____</span><span>____</span><span>____</span><span>____</span><span class="sentence-punctuation">？</span></div>
+          <label for="translation-answer">你的英文翻译</label>
+          <textarea id="translation-answer" rows="3" autocomplete="off" placeholder="请在这里写下完整英文句子…"></textarea>
+          <p class="save-note" id="save-note">输入内容会自动保存；切换页面或刷新后仍可继续。</p>
+          <button class="primary-button" id="submit-answer" type="button">保存并完成本题 <span aria-hidden="true">→</span></button>
+        </article>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="src/main.js"></script>
+  </body>
+</html>
