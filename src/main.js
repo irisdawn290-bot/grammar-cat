@@ -3,6 +3,7 @@ const questions = [
   { id: 'get-up-six', chinese: '我每天早上六点起床。', wordCount: 7, punctuation: '。' },
   { id: 'reading-book', chinese: '她正在读一本有趣的书。', wordCount: 6, punctuation: '。' },
 ];
+
 const grammarLessons = [
   { id: 'parts-of-speech', title: '词性', icon: '🐾', summary: '先认识句子里的“角色”：名词、动词、形容词、副词等。', structure: '名词 (N.) + 动词 (V.) + 其他成分；形容词修饰名词，副词修饰动词、形容词或全句。', example: 'The little cat runs quickly.（这只小猫跑得很快。）', mistake: '不要把形容词和副词混用：She sings beautiful. ✗ → She sings beautifully. ✓', exercise: '在 “The happy children laughed loudly.” 中，happy 和 loudly 分别是什么词性？', answer: 'happy 是形容词，修饰 children；loudly 是副词，修饰 laughed。' },
   { id: 'tenses', title: '时态', icon: '⏰', summary: '用动词形式表达动作发生的时间和状态。', structure: '一般现在：do/does；一般过去：did；现在进行：am/is/are doing；现在完成：have/has done。', example: 'She has lived here for three years.（她已经在这里住了三年。）', mistake: 'for + 一段时间，since + 时间点：I have studied English for five years. ✓', exercise: '选择正确形式：I ___ (finish) my homework already.', answer: 'have finished。already 常与现在完成时连用。' },
@@ -17,6 +18,7 @@ const grammarLessons = [
   { id: 'subject-verb-agreement', title: '主谓一致', icon: '🤝', summary: '谓语动词的人称和数要与真正的主语一致。', structure: '单数主语 + 单数谓语；复数主语 + 复数谓语；each/every 作主语时常用单数。', example: 'Each of the students has a book.（每个学生都有一本书。）', mistake: '主语后插入的 with/as well as 不改变谓语：The teacher with students is…', exercise: '填空：Neither Tom nor his friends ___ (be) ready.', answer: 'are。neither…nor… 的谓语常与靠近它的主语 friends 一致。' },
   { id: 'prepositions', title: '介词搭配', icon: '🧩', summary: '掌握常用动词、形容词和名词后的固定介词。', structure: 'be interested in；be good at；listen to；depend on；arrive at/in。', example: 'She is interested in science.（她对科学感兴趣。）', mistake: 'discuss 是及物动词：discuss the plan ✓，不是 discuss about the plan。', exercise: '填空：He is good ___ playing the piano.', answer: 'at。be good at + 名词/动名词。' },
 ];
+
 const storageKey = 'grammar-cat.translation-progress.v1';
 const toast = document.querySelector('#toast');
 const views = {
@@ -67,12 +69,63 @@ let activeGrammarLessonId = grammarLessons[0].id;
 function renderGrammarLesson(lessonId) {
   const lesson = grammarLessons.find((item) => item.id === lessonId) || grammarLessons[0];
   activeGrammarLessonId = lesson.id;
-  document.querySelector('#grammar-category-list').innerHTML = grammarLessons.map((item) => `<button type="button" class="grammar-category ${item.id === lesson.id ? 'is-active' : ''}" data-lesson-id="${item.id}"><span>${item.icon}</span>${item.title}</button>`).join('');
-  document.querySelector('#grammar-lesson').innerHTML = `<div class="lesson-title"><span>${lesson.icon}</span><div><p class="eyebrow">GRAMMAR NOTE</p><h2>${lesson.title}</h2></div></div><p class="lesson-summary">${lesson.summary}</p><section class="lesson-block"><h3>核心结构</h3><p>${lesson.structure}</p></section><section class="lesson-block example-block"><h3>例句</h3><p>${lesson.example}</p></section><section class="lesson-block mistake-block"><h3>易错点</h3><p>${lesson.mistake}</p></section><section class="mini-exercise"><p class="eyebrow">MINI PRACTICE</p><h3>${lesson.exercise}</h3><button type="button" class="answer-toggle">查看答案</button><p class="exercise-answer" hidden>${lesson.answer}</p></section>`;
-  document.querySelectorAll('[data-lesson-id]').forEach((button) => button.addEventListener('click', () => renderGrammarLesson(button.dataset.lessonId)));
-  document.querySelector('.answer-toggle').addEventListener('click', (event) => { const answer = document.querySelector('.exercise-answer'); answer.hidden = !answer.hidden; event.currentTarget.textContent = answer.hidden ? '查看答案' : '收起答案'; });
-}
 
+  document.querySelector('#grammar-category-list').innerHTML = grammarLessons
+    .map(
+      (item) =>
+        `<button type="button" class="grammar-category ${
+          item.id === lesson.id ? 'is-active' : ''
+        }" data-lesson-id="${item.id}"><span>${item.icon}</span>${item.title}</button>`,
+    )
+    .join('');
+
+  document.querySelector('#grammar-lesson').innerHTML = `
+    <div class="lesson-title">
+      <span>${lesson.icon}</span>
+      <div>
+        <p class="eyebrow">GRAMMAR NOTE</p>
+        <h2>${lesson.title}</h2>
+      </div>
+    </div>
+
+    <p class="lesson-summary">${lesson.summary}</p>
+
+    <section class="lesson-block">
+      <h3>核心结构</h3>
+      <p>${lesson.structure}</p>
+    </section>
+
+    <section class="lesson-block example-block">
+      <h3>例句</h3>
+      <p>${lesson.example}</p>
+    </section>
+
+    <section class="lesson-block mistake-block">
+      <h3>易错点</h3>
+      <p>${lesson.mistake}</p>
+    </section>
+
+    <section class="mini-exercise">
+      <p class="eyebrow">MINI PRACTICE</p>
+      <h3>${lesson.exercise}</h3>
+      <button type="button" class="answer-toggle">查看答案</button>
+      <p class="exercise-answer" hidden>${lesson.answer}</p>
+    </section>
+  `;
+
+  document.querySelectorAll('[data-lesson-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      renderGrammarLesson(button.dataset.lessonId);
+    });
+  });
+
+  document.querySelector('.answer-toggle').addEventListener('click', (event) => {
+    const answer = document.querySelector('.exercise-answer');
+
+    answer.hidden = !answer.hidden;
+    event.currentTarget.textContent = answer.hidden ? '查看答案' : '收起答案';
+  });
+}
 function renderQuestion() {
   const question = questions[progress.currentQuestionIndex];
   const answer = document.querySelector('#translation-answer');
