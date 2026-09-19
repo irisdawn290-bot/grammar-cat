@@ -52,14 +52,54 @@ const views = {
   translation: document.querySelector('#translation-view'),
 };
 
-function createProgress() { return { currentQuestionIndex: 0, answers: {}, completedQuestionIds: [], feedbackQuestionId: null }; }
+function shuffle(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function createQuestionOrder() {
+  // 保持整体难度递增，只在每个难度阶段内部随机排序。
+  const stages = Array.from({ length: 5 }, (_, stageIndex) => {
+    const start = stageIndex * 6;
+    return shuffle(questions.slice(start, start + 6).map((question) => question.id));
+  });
+  return stages.flat();
+}
+
+function createProgress() {
+  return {
+    currentQuestionIndex: 0,
+    questionOrder: createQuestionOrder(),
+    answers: {},
+    completedQuestionIds: [],
+    feedbackQuestionId: null
+  };
+}
+
+function getCurrentQuestion() {
+  const questionId = progress.questionOrder?.[progress.currentQuestionIndex];
+  return questions.find((question) => question.id === questionId) || questions[0];
+}
+
+function getQuestionWordCount(question) {
+  return question.answers[0].trim().split(/\\s+/).filter(Boolean).length;
+}
 
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
     if (!saved || !Number.isInteger(saved.currentQuestionIndex) || !saved.answers || !Array.isArray(saved.completedQuestionIds)) return createProgress();
+    const savedOrder = Array.isArray(saved.questionOrder) && saved.questionOrder.length === questions.length
+      ? saved.questionOrder.filter((id) => questions.some((question) => question.id === id))
+      : questions.map((question) => question.id);
+    const questionOrder = savedOrder.length === questions.length ? savedOrder : questions.map((question) => question.id);
     return {
-      currentQuestionIndex: Math.min(Math.max(saved.currentQuestionIndex, 0), questions.length - 1),
+      currentQuestionIndex: Math.min(Math.max(saved.currentQuestionIndex, 0), questionOrder.length - 1),
+      questionOrder,
       answers: saved.answers,
       completedQuestionIds: saved.completedQuestionIds.filter((id) => questions.some((question) => question.id === id)),
       feedbackQuestionId: questions.some((question) => question.id === saved.feedbackQuestionId) ? saved.feedbackQuestionId : null,
@@ -100,15 +140,15 @@ function renderGrammarLesson(lessonId) {
 }
 
 function renderQuestion() {
-  const question = questions[progress.currentQuestionIndex];
+  const question = getCurrentQuestion();
   const answer = document.querySelector('#translation-answer');
   document.querySelector('#question-count').textContent = `第 ${progress.currentQuestionIndex + 1} 题，共 ${questions.length} 题`;
   document.querySelector('#completed-count').textContent = `已完成 ${progress.completedQuestionIds.length} 题`;
   document.querySelector('#test-progress-bar').style.width = `${(progress.completedQuestionIds.length / questions.length) * 100}%`;
   document.querySelector('#chinese-question').textContent = `“${question.chinese}”`;
-  document.querySelector('#word-count').textContent = `${question.wordCount} 个单词`;
-  document.querySelector('#sentence-blanks').setAttribute('aria-label', `英文答案有 ${question.wordCount} 个单词`);
-  document.querySelector('#sentence-blanks').innerHTML = `${Array.from({ length: question.wordCount }, () => '<span>____</span>').join('')}<span class="sentence-punctuation">${question.punctuation}</span>`;
+  const wordCount = getQuestionWordCount(question);\n  document.querySelector('#word-count').textContent = `${wordCount} 个单词`;
+  document.querySelector('#sentence-blanks').setAttribute('aria-label', `英文答案有 ${wordCount} 个单词`);
+  document.querySelector('#sentence-blanks').innerHTML = `${Array.from({ length: wordCount }, () => '<span>____</span>').join('')}<span class="sentence-punctuation">${question.punctuation || ''}</span>`;
   answer.value = progress.answers[question.id] || '';
   document.querySelector('#submit-answer').textContent = progress.completedQuestionIds.includes(question.id) ? '已完成，查看本题反馈 →' : '保存并查看反馈 →';
   document.querySelector('.question-card').hidden = progress.feedbackQuestionId === question.id;
@@ -131,7 +171,7 @@ function renderFeedback(question) {
 }
 
 function saveCurrentAnswer() {
-  const question = questions[progress.currentQuestionIndex];
+  const question = getCurrentQuestion();
   progress.answers[question.id] = document.querySelector('#translation-answer').value;
   persistProgress();
 }
@@ -154,7 +194,7 @@ document.querySelector('#translation-answer').addEventListener('input', () => {
 
 document.querySelector('#submit-answer').addEventListener('click', () => {
   saveCurrentAnswer();
-  const question = questions[progress.currentQuestionIndex];
+  const question = getCurrentQuestion();
   if (!progress.answers[question.id].trim()) { showToast('先写下你的完整英文翻译，再完成本题吧。'); return; }
   if (!progress.completedQuestionIds.includes(question.id)) progress.completedQuestionIds.push(question.id);
   progress.feedbackQuestionId = question.id;
@@ -163,7 +203,7 @@ document.querySelector('#submit-answer').addEventListener('click', () => {
 });
 
 document.querySelector('#next-question').addEventListener('click', () => {
-  const isLastQuestion = progress.currentQuestionIndex === questions.length - 1;
+  const isLastQuestion = progress.currentQuestionIndex === progress.questionOrder.length - 1;
   progress.feedbackQuestionId = null;
   if (!isLastQuestion) progress.currentQuestionIndex += 1;
   persistProgress();
@@ -173,8 +213,9 @@ document.querySelector('#next-question').addEventListener('click', () => {
 
 document.querySelector('#restart-test').addEventListener('click', () => {
   if (!window.confirm('重新开始会清空当前测试的所有答案和进度，确定吗？')) return;
-  progress = createProgress();
   localStorage.removeItem(storageKey);
+  progress = createProgress();
+  persistProgress();
   renderQuestion();
   showToast('测试已重新开始。');
 });
