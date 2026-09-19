@@ -140,6 +140,13 @@ document.querySelectorAll('[data-view]').forEach((entry) => {
   entry.addEventListener('click', (event) => { event.preventDefault(); showView(entry.dataset.view); });
 });
 
+document.querySelector('#translation-answer').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    document.querySelector('#submit-answer').click();
+  }
+});
+
 document.querySelector('#translation-answer').addEventListener('input', () => {
   saveCurrentAnswer();
   document.querySelector('#save-note').textContent = '已自动保存。切换页面或刷新后仍可继续。';
